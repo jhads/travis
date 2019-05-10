@@ -11,7 +11,7 @@ EXCLUDE_EXTNS = ['.png','.pyc','.pyc'] # Committed file extensions that do not r
 
 
 
-def calc_readme_score(fpath, total_described=0, total_found=0, html=None):
+def calc_readme_score(fpath, total_described=0, total_found=0, html=None, verbose=True):
     """
     Recursive function to loop through a file directory to calculate how many files are listed
     and how many are described in the folders' README files. Pass fpath argument to specify the top
@@ -28,8 +28,10 @@ def calc_readme_score(fpath, total_described=0, total_found=0, html=None):
 
     if my_readme is None:
         total_found += len(files)
-        print(files)
-        for file in files: html.add_excluded_file(file)
+        if verbose:
+            print(files)
+        if html is not None:
+            for file in files: html.add_excluded_file(file)
         total_described += 0
     else:
         total_found, total_described, html = get_no_files_in_readme(fpath, my_readme, files,
@@ -40,14 +42,19 @@ def calc_readme_score(fpath, total_described=0, total_found=0, html=None):
     # Recursive call to each subfolder
     dirs = [d for d in os.listdir(fpath) if os.path.isdir(os.path.join(fpath, d)) and d != '.git']
     for subfolder in dirs:
-        html.add_directory(subfolder)
-        html.increment_layer()
+        if html is not None:
+            html.add_directory(subfolder)
+            html.increment_layer()
+
         total_described, total_found, html = calc_readme_score(os.path.join(fpath, subfolder),
-                                                               total_described, total_found, html
+                                                               total_described, total_found, 
+                                                               html, verbose
                                                               )
 
+    if html is not None:
+        html.decrement_layer()
+
     assert total_found >= total_described
-    html.decrement_layer()
     return total_described, total_found, html
 
 def correct_file(file):
@@ -88,9 +95,12 @@ def get_no_files_in_readme(fpath, my_readme, files, total_found, total_described
 
         if file_found:
             total_described += 1
-            html.add_included_file(file)
+            if html is not None:
+                html.add_included_file(file)
         else:
-            html.add_excluded_file(file)
+            if html is not None:
+                html.add_excluded_file(file)
+
     return total_found, total_described, html
 
 
