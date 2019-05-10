@@ -1,6 +1,7 @@
 ## Imports ##
 import os
 import git
+import argparse
 
 ## Constants ##
 README_NAMES = ['README', 'readme', 'README.md', 'readme.md']
@@ -150,3 +151,12 @@ class HtmlReport:
         self.text += file_name
         self.print_layer_end()
         self.text += "</h4>" + "\n"
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Calculate README score on a given directory')
+    parser.add_argument('path', help='the file directory of interest')
+    args = parser.parse_args()
+
+    found, total, _ = calc_readme_score(args.path, verbose=False)
+    score = 100 * found / total
+    print('README score: %.2f%% (%d / %d)' % (score, found, total))
