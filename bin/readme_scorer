@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+
+
+import os
+from travis.readme_scorer import calc_readme_score, HtmlReport
+CURRENT_DIRECTORY = os.getcwd()
+INITIAL_HTML = """
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Readme Score report</title>
+<link rel="stylesheet" href="style.css" type="text/css">
+
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="jquery.ba-throttle-debounce.min.js"></script>
+<script type="text/javascript" src="jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="jquery.hotkeys.js"></script>
+<script type="text/javascript" src="coverage_html.js"></script>
+<script type="text/javascript">
+jQuery(document).ready(coverage.index_ready);
+</script>
+
+<style>
+h3 {color: gray}
+.included_file{color: green;}
+.excluded_file{color: red;}
+.direct {color:  #6666ff;}
+</style>
+</head>
+<body class="indexfile">
+"""
+HTML = HtmlReport(os.path.join("index.html", CURRENT_DIRECTORY), INITIAL_HTML)
+TOTAL_DESCRIBED, TOTAL_FOUND, HTML = calc_readme_score(CURRENT_DIRECTORY, html=HTML)
+HTML.finalise_report(TOTAL_DESCRIBED, TOTAL_FOUND)
+
+with open("readme_scorer_report.html", "w") as file_:
+    file_.write(HTML.text)
