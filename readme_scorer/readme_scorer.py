@@ -1,3 +1,10 @@
+"""
+Run the README scorer from within Python or the command line
+
+@author: luke
+@author: peter
+"""
+
 ## Imports ##
 import os
 import git
